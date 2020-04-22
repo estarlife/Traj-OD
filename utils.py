@@ -109,37 +109,6 @@ def XYToLatLonGivenOrigin(lat1, lon1, x, y):
 	lon2 = lon1 + x/(40000*math.cos((lat1+lat2)*math.pi/360)/360)
 	return lat2, lon2
 
-def nearOrigin(originLat, originLon, currentLat, currentLon, thresh = 0.5): # Default: if within 500 metre, then we regard as this start point close to the origin
-	x, y = LatLonToXY(originLat, originLon, currentLat, currentLon)
-	return (np.linalg.norm([x,y],2) <= thresh) 
-
-def withinStudyWindow(originLatitude, originLongtitude, vesselLatitude,vesselLongtitude,currentLat, currentLon):
-	max_X, max_Y = LatLonToXY(originLatitude, originLongtitude, vesselLatitude,vesselLongtitude)
-	current_X, current_Y = LatLonToXY(originLatitude, originLongtitude, currentLat, currentLon)
-	# if(current_X * max_X < 0): # if X direction is not consistent
-	# 	return False
-	# if(current_Y * max_Y < 0):
-	# 	return False
-	# if(abs(current_X) > abs(max_X)):
-	# 	return False
-	# if(abs(current_Y) > abs(max_Y)):
-	# 	return False
-
-	# Try a study window of a square surrounding the origin
-	squareWindowLen = max(max_X, max_Y)
-	if(abs(current_X) < squareWindowLen and abs(current_Y) < squareWindowLen):
-		return True
-	else:
-		return False
-
-def withinTimeConstriant(startTS, currentTS, timeWindowInHours):
-	return ((currentTS - startTS) < timeWindowInHours * 3600)
-
-def convertKnotToMeterPerSec (knot):
-	KNOTTOKMPERHOUR = 1.85200
-	KmPerhourToMetrePerSec = 1/3.6
-	return knot * KNOTTOKMPERHOUR * KmPerhourToMetrePerSec
-
 def notNoise(prevPosition, nextPosition, MAX_SPEED):
 	"""
 	MAX_SPEED: is in knot;
@@ -148,16 +117,6 @@ def notNoise(prevPosition, nextPosition, MAX_SPEED):
 	dt = nextPosition[dataDict["ts"]] - prevPosition[dataDict["ts"]] # in secs
 	dx, dy = LatLonToXY(prevPosition[dataDict["latitude"]], prevPosition[dataDict["longitude"]], nextPosition[dataDict["latitude"]], nextPosition[dataDict["longitude"]])
 	return (np.linalg.norm([dx,dy],2) < (dt * convertKnotToMeterPerSec(MAX_SPEED))/1000.0) 
-
-
-def isInlandPoint(lat, lon):
-	if(lat >= IN_LAND_LOWER_LAT and \
-		lat <= IN_LAND_UPPER_LAT and \
-		lon >= IN_LAND_WEST_LON and \
-		lon <= IN_LAND_EAST_LON):
-		return True
-	else:
-		return False
 
 def isErrorTrajectory(trajectory, center_lat_sg, center_lon_sg):
 	"""
@@ -171,8 +130,6 @@ def isErrorTrajectory(trajectory, center_lat_sg, center_lon_sg):
 		lon = trajectory[i][dataDict["longitude"]]
 		dx, dy = LatLonToXY (lat, lon, center_lat_sg, center_lon_sg)
 		if(np.linalg.norm([dx, dy], 2) > MAX_DISTANCE_FROM_SG):
-			return True
-		if (isInlandPoint(lat, lon)):
 			return True
 	return False
 
@@ -194,5 +151,5 @@ def removeErrorTrajectoryFromList(trajectories, center_lat_sg = 1.2, center_lon_
 	return trajectories
 
 
-
+#TRAJECTORY IN LIST OR NP.NDARRAY 
 
