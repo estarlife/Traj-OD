@@ -11,7 +11,6 @@ import time
 from scipy import interpolate
 import scipy.spatial.distance as distance
 from collections import OrderedDict
-import writeToCSV
 import copy
 import sys
 import scipy.spatial.distance as DIST
@@ -26,102 +25,37 @@ CONSTANTS
 """
 
 dataDict = {
-"navigation_status":0,
-"rate_of_turn":1,
-"speed_over_ground":2,
-"latitude":3,
-"longitude":4,
-"course_over_ground":5,
-"true_heading":6,
-"ts":7,
-"mmsi":8
+"tid":0,
+"ts":1,
+"latitude":2,
+"longitude":3
 }
 
 data_dict_x_y_coordinate = {
-"navigation_status":0,
-"rate_of_turn":1,
-"speed_over_ground":2,
-"y":3,
-"x":4,
-"course_over_ground":5,
-"true_heading":6,
-"ts":7,
-"mmsi":8
+"tid":0,
+"ts":1,
+"y":2,
+"x":3
 }
 
-CENTER_LAT_SG = 1.2
-
-CENTER_LON_SG = 103.8
-
-GEOSCALE = 600000.0
-
-KNOTTOKMPERHOUR = 1.85200
-
-NEIGHBOURHOOD = 0.2
-
-NEIGHBOURHOOD_ENDPOINT = 0.1
-
-NEIGHBOURHOOD_ORIGIN = 0.1
-
-STAYTIME_THRESH = 1800 # 1 hour
-
-MAX_FLOAT = sys.float_info.max
-
-MAX_DISTANCE_FROM_SG = 100 # 100 km
-
-BOUNDARY_TIME_DIFFERENCE = 7 * 3600
-
-UNKNOWN_COURSE_OVER_GROUND = 3600
-
-SpeedDistanceTuple = namedtuple('SpeedDistanceTuple', ['speed', 'distance'])
 
 ClusterCentroidTuple = namedtuple('ClusterCentroidTuple', ['cluster', 'centroid'])
 
-### For detection inland error data, adjust to specify the cleaning extent###
-IN_LAND_UPPER_LAT = 1.391693577440254
-IN_LAND_LOWER_LAT = 1.3354045918802477
-IN_LAND_WEST_LON = 103.85238647460938
-IN_LAND_EAST_LON = 103.89976501464844
-
-
-
-def queryPath(path):
-	"""
-	checks if the given path exisits, if not existing, create and return it; else, just echo back it
-	"""
-	if(not os.path.isdir("./{path}".format(
-		path = path))):
-		os.makedirs("./{path}".format(
-			path = path))
-	return path
-
-
 # from Lat Lon to X Y coordinates in Km
-def LatLonToXY (lat1,lon1,lat2, lon2): # lat1 and lon1 are assumed to be origins, and all inputs are in proper lat lon
+def LatLonToXY (lat1,lon1,lat2, lon2): 
 	# fix origin for display
 	dx = (lon2-lon1)*40000*math.cos((lat1+lat2)*math.pi/360)/360
 	dy = (lat1-lat2)*40000/360
 	return dx, dy
 
-# from X Y coordinates in Km to Lat Lon with a given origin Lat/Lon point as reference; Note: X-positive-axis is rightwards and Y-positive axis is downwards
+# from X Y coordinates in Km to Lat Lon 
 def XYToLatLonGivenOrigin(lat1, lon1, x, y):
 	lat2 = lat1 - y*360/40000
 	lon2 = lon1 + x/(40000*math.cos((lat1+lat2)*math.pi/360)/360)
 	return lat2, lon2
 
-def notNoise(prevPosition, nextPosition, MAX_SPEED):
-	"""
-	MAX_SPEED: is in knot;
-	returns: True if the distance between prevPosition and nextPosition can not be attained, i.e., noise data
-	"""
-	dt = nextPosition[dataDict["ts"]] - prevPosition[dataDict["ts"]] # in secs
-	dx, dy = LatLonToXY(prevPosition[dataDict["latitude"]], prevPosition[dataDict["longitude"]], nextPosition[dataDict["latitude"]], nextPosition[dataDict["longitude"]])
-	return (np.linalg.norm([dx,dy],2) < (dt * convertKnotToMeterPerSec(MAX_SPEED))/1000.0) 
-
 def isErrorTrajectory(trajectory, center_lat_sg, center_lon_sg):
-	"""
-	Checks if the give trajectory is too far from the Port Center, or only contains less than one trajectory point
-	"""
+
 	if(len(trajectory) <= 1):
 		return True
 
@@ -134,11 +68,7 @@ def isErrorTrajectory(trajectory, center_lat_sg, center_lon_sg):
 	return False
 
 def removeErrorTrajectoryFromList(trajectories, center_lat_sg = 1.2, center_lon_sg = 103.8):
-	"""
-	note: list object passing to function will be by reference, while using np.delete(), returns a new copy thus need to return
-	trajectories: normal trajectories with lat and lon
-	return: the list of trajectories with error ones removed
-	"""
+
 	i = 0
 	while(i < len(trajectories)):
 		if(isErrorTrajectory(trajectories[i], center_lat_sg, center_lon_sg)):
@@ -149,7 +79,6 @@ def removeErrorTrajectoryFromList(trajectories, center_lat_sg = 1.2, center_lon_
 		else:
 			i += 1
 	return trajectories
-
 
 #TRAJECTORY IN LIST OR NP.NDARRAY 
 
