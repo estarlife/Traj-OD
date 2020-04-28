@@ -82,3 +82,46 @@ def removeErrorTrajectoryFromList(trajectories, center_lat_sg = 1.2, center_lon_
 
 #TRAJECTORY IN LIST OR NP.NDARRAY 
 
+def writeDataToCSV(data, path, file_name):
+	"""
+	path: without trailing '/'
+	file_name: string of name of file, without .csv suffix
+	"""
+	# print path + "/" +npz_file_name[:npz_file_name.find(".")]+ ".csv"
+	# raise ValueError
+	dataDict = {
+	"ts":0,
+	"latitude":1,
+	"longitude":2
+	}
+
+	# datetime.datetime.fromtimestamp(currentTS).strftime('%Y-%m-%dT%H:%M:%SZ')
+
+	with open(path +"/"+ file_name+ ".csv", 'w') as csvfile:
+		fieldnames = [\
+		'navigation_status', \
+		'rate_of_turn', \
+		'speed_over_ground', \
+		'latitude', \
+		'longitude', \
+		'course_over_ground', \
+		'true_heading',\
+		'ts', \
+		'ts_string']
+		writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
+		
+		writer.writeheader()
+	
+		for i in range (0, data.shape[0]):
+			writer.writerow({'navigation_status': data[i][dataDict['navigation_status']], 
+				'rate_of_turn':data[i][dataDict['rate_of_turn']], 
+				'speed_over_ground':data[i][dataDict['speed_over_ground']], 
+				'latitude':data[i][dataDict['latitude']], 
+				'longitude':data[i][dataDict['longitude']], 
+				'course_over_ground':data[i][dataDict['course_over_ground']], 
+				'true_heading':data[i][dataDict['true_heading']], 
+				'ts':data[i][dataDict['ts']],
+				'ts_string':datetime.datetime.fromtimestamp(data[i][dataDict['ts']]).strftime('%Y-%m-%dT%H:%M:%SZ')
+				})
+
+	return
