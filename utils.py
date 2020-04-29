@@ -98,16 +98,10 @@ def writeDataToCSV(data, path, file_name):
 	# datetime.datetime.fromtimestamp(currentTS).strftime('%Y-%m-%dT%H:%M:%SZ')
 
 	with open(path +"/"+ file_name+ ".csv", 'w') as csvfile:
-		fieldnames = [\
-		'navigation_status', \
-		'rate_of_turn', \
-		'speed_over_ground', \
+		fieldnames = [
 		'latitude', \
 		'longitude', \
-		'course_over_ground', \
-		'true_heading',\
-		'ts', \
-		'ts_string']
+		'ts']
 		writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
 		
 		writer.writeheader()
