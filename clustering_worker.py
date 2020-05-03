@@ -23,39 +23,29 @@ import vector_computation
 from math import acos,pi
 from math import sqrt
 
-def trajectoryDissimilarityL2(t1, t2):
-		# t1,t2 in  X, Y form
-	i = 0
-	j = 0
-	dissimilarity = 0.0
-	while(i < len(t1) and j < len(t2)):
-		dissimilarity += DIST.euclidean([t1[i][utils.data_dict_x_y_coordinate["x"]] ,t1[i][utils.data_dict_x_y_coordinate["y"]]], \
-			[t2[j][utils.data_dict_x_y_coordinate["x"]], t2[j][utils.data_dict_x_y_coordinate["y"]]])
-		i += 1
-		j += 1
-	# only one of the following loops will be entered
-	while(i < len(t1)):
-		dissimilarity += DIST.euclidean([t1[i][utils.data_dict_x_y_coordinate["x"]], t1[i][utils.data_dict_x_y_coordinate["y"]]], \
-		[t2[j - 1][utils.data_dict_x_y_coordinate["x"]], t2[j - 1][utils.data_dict_x_y_coordinate["y"]]]) # j -1 to get the last point in t2
-		i += 1
-
-	while(j < len(t2)):
-		dissimilarity += DIST.euclidean([t1[i - 1][utils.data_dict_x_y_coordinate["x"]], t1[i - 1][utils.data_dict_x_y_coordinate["y"]]], \
-			[t2[j][utils.data_dict_x_y_coordinate["x"]], t2[j][utils.data_dict_x_y_coordinate["y"]]])
-		j += 1
-	return dissimilarity
 
 # vertical distance dissimilarity(project from t2 to t1)
 def trajectoryDissimilarityVertical(t1, t2):
-		# t1,t2 in  X, Y form
+		# t1,t2 in  X, Y form 
 	vec1=[t2[0][0]-t1[0][0],t2[0][1]-t1[0][1]] #t1.start to t2.start
 	vec2=[t2[1][0]-t1[0][0],t2[1][1]-t1[0][1]] #t1.start to t2.end
 	vec3=[t1[1][0]-t1[0][0],t1[1][1]-t1[0][1]] #t1.start to t1.end
-	unit=normalized(vec3)
+	if vec3==[0,0]:
+		return max(vector_computation.magnitude(vec1),vector_computation.magnitude(vec2))
+		
+	unit=vector_computation.normalized(vec3)
 
-	l12=magnitude(vec1)**2-dot(vec1,unit)**2
-	l22=magnitude(vec2)**2-dot(vec2,unit)**2
-	dissimilarity = (l1+l2)/(sqrt(l12)+sqrt(l22))
+	l12=vector_computation.magnitude(vec1)**2-vector_computation.dot(vec1,unit)**2
+	l22=vector_computation.magnitude(vec2)**2-vector_computation.dot(vec2,unit)**2
+	if abs(l12)<0.000001: # prevent l12 l22 from being negative
+		l12=0
+	if abs(l22)<0.000001:
+		l22=0
+
+	if l12+l22==0:
+		dissimilarity=0
+	else:
+		dissimilarity = (l12+l22)/(sqrt(l12)+sqrt(l22))
 	
 	return dissimilarity
 
@@ -68,7 +58,6 @@ def trajectoryDissimilarityParallel(t1, t2):
 	vec4=[t2[1][0]-t1[1][0],t2[1][1]-t1[1][1]] #t1.end to t2.end
 	vec5=[t1[1][0]-t1[0][0],t1[1][1]-t1[0][1]] #t1.start to t1.end
 	unit=vector_computation.normalized(vec5)
-	print(vec1,vec2,vec3,vec4,unit)
 	dissimilarity=min(abs(vector_computation.dot(vec1,unit)), \
                       abs(vector_computation.dot(vec2,unit)),abs(vector_computation.dot(vec3,unit)),abs(vector_computation.dot(vec4,unit)))
 	return dissimilarity
@@ -78,17 +67,21 @@ def trajectoryDissimilarityAngular(t1, t2):
 		# t1,t2 in  X, Y form
 	vec1=[t1[1][0]-t1[0][0],t1[1][1]-t1[0][1]] #t1.start to t1.end
 	vec2=[t2[1][0]-t2[0][0],t2[1][1]-t2[0][1]] #t2.start to t2.end
+	if vec1==[0,0] or vec2==[0,0]:
+		return 0
 	unit=vector_computation.normalized(vec1)
-
-	dissimilarity=sqrt(vector_computation.magnitude(vec2)**2-vector_computation.dot(vec2,unit)**2)
+	tmp=vector_computation.magnitude(vec2)**2-vector_computation.dot(vec2,unit)**2
+	if abs(tmp)<0.000001:
+		tmp=0
+	dissimilarity=sqrt(tmp)
 	return dissimilarity
 
 def distanceBetweenTwoPoint(p1, p2):
 
 
 	return DIST.euclidean( \
-		[p1[utils.data_dict_x_y_coordinate["x"]], p1[utils.data_dict_x_y_coordinate["y"]]], \
-		[p2[utils.data_dict_x_y_coordinate["x"]], p2[utils.data_dict_x_y_coordinate["y"]]])
+		[p1[0], p1[1]], \
+		[p2[0], p2[1]])
 
 def getTrajectoryLength(t):
 	"""

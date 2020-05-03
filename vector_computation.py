@@ -55,6 +55,8 @@ def angle_with(vec1, vec2):
 
 # vec1在vec2上的投影
 def projection(vec1, vec2):
+    if vec2==0:
+        return vec1
     unit = normalized(vec2)
     weight = dot(vec1,unit)
     return timesscalar(unit, weight)

@@ -32,7 +32,7 @@ def traj_partition(traj):
 
     
     for i in range(len(traj)):
-        tmp=traj[i][0][0]    
+        tmp=traj[i][0][0]    #??????
         tmp_index=0
         endpoint=[]
         for j in range(len(traj[i])):
@@ -40,10 +40,10 @@ def traj_partition(traj):
 #           print(j, len(traj[i]))
             if j==len(traj[i])-1:
                 endpoint.append([tmp_index,j])
-            elif  traj[i][j][0]-tmp>10000:
+            elif  traj[i][j][0]-tmp>10000:  #????10000s???
                 endpoint.append([tmp_index,j])
-                tmp_index=j+1
-                tmp=traj[i][j+1][0]
+                tmp_index=j
+                tmp=traj[i][j][0]
         all_endpoint.append(endpoint)
     return all_endpoint
 
