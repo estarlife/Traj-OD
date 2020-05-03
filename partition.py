@@ -55,6 +55,7 @@ def subtrajectory(traj, endpoint): #endpoint in form [traj_index, []]
 
 def subtrajectoryfromst2ed(traj, endpoint):
     traj_index, [st, ed]=endpoint
-    subtraj=[traj[traj_index][st],traj[traj_index][ed]]
+    #subtraj=[traj[traj_index][st],traj[traj_index][ed]] #with timestamp
+    subtraj=[traj[traj_index][st][1:],traj[traj_index][ed][1:]] #without timestamp
     return subtraj
 

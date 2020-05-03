@@ -64,13 +64,13 @@ def trajectoryDissimilarityParallel(t1, t2):
 		# t1,t2 in  X, Y form
 	vec1=[t2[0][0]-t1[0][0],t2[0][1]-t1[0][1]] #t1.start to t2.start
 	vec2=[t2[1][0]-t1[0][0],t2[1][1]-t1[0][1]] #t1.start to t2.end
-	vec3=[t2[0][0]-t2[0][0],t2[0][1]-t2[0][1]] #t1.end to t2.start
-	vec4=[t2[1][0]-t1[0][0],t2[1][1]-t1[0][1]] #t1.end to t2.end
-	
-	vec5=[t1[1][0]-t1[0][0],t1[1][1]-t1[0][1]] #t2.start to t2.end
-	unit=normalized(vec5)
-
-	dissimilarity=min(abs(dot(vec1,unit)),abs(dot(vec2,unit)),abs(dot(vec3,unit)),abs(dot(vec4,unit)))
+	vec3=[t2[0][0]-t1[1][0],t2[0][1]-t1[1][1]] #t1.end to t2.start
+	vec4=[t2[1][0]-t1[1][0],t2[1][1]-t1[1][1]] #t1.end to t2.end
+	vec5=[t1[1][0]-t1[0][0],t1[1][1]-t1[0][1]] #t1.start to t1.end
+	unit=vector_computation.normalized(vec5)
+	print(vec1,vec2,vec3,vec4,unit)
+	dissimilarity=min(abs(vector_computation.dot(vec1,unit)), \
+                      abs(vector_computation.dot(vec2,unit)),abs(vector_computation.dot(vec3,unit)),abs(vector_computation.dot(vec4,unit)))
 	return dissimilarity
 
 # angular distance dissimilarity(project from t2 to t1)
@@ -78,9 +78,9 @@ def trajectoryDissimilarityAngular(t1, t2):
 		# t1,t2 in  X, Y form
 	vec1=[t1[1][0]-t1[0][0],t1[1][1]-t1[0][1]] #t1.start to t1.end
 	vec2=[t2[1][0]-t2[0][0],t2[1][1]-t2[0][1]] #t2.start to t2.end
-	unit=normalized(vec1)
+	unit=vector_computation.normalized(vec1)
 
-	dissimilarity=sqrt(magnitude(vec2)**2-dot(vec2,unit)**2)
+	dissimilarity=sqrt(vector_computation.magnitude(vec2)**2-vector_computation.dot(vec2,unit)**2)
 	return dissimilarity
 
 def distanceBetweenTwoPoint(p1, p2):
@@ -99,7 +99,7 @@ def getTrajectoryLength(t):
 	cur_pos = t[0]
 	for i in range(1, len(t)):
 		next_pos = t[i]
-		distance += distanceBetweenTwoTrajectoryPoint(cur_pos, next_pos)
+		distance += distanceBetweenTwoPoint(cur_pos, next_pos)
 		cur_pos = next_pos # forward current position
 
 	return distance

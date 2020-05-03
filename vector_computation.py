@@ -23,26 +23,25 @@ from math import acos,pi
 from math import sqrt
 from decimal import Decimal,getcontext
 
+
 # 向量的大小
 def magnitude(vec):
     return sqrt(vec[0] ** 2 + vec[1] ** 2)
 
+# 标量乘法
+def timesscalar(vec, m):
+    return [m*vec[0] , m*vec[1]]
+
 # 单位向量
 def normalized(vec):
-
-    magnitude = magnitude(vec)
-    return times_scalar(vec, 1.0/magnitude)
-
-# 标量乘法
-def times_scalar(vec, m):
-    return [Decimal(m)*vec[0] , Decimal(m)*vec[1]]
+    return timesscalar(vec, 1.0/magnitude(vec))
 
 # 两个向量的点积
 def dot(vec,v):
     return vec[0]*v[0]+vec[1]*v[1]
 
 # 两个向量之间的角度
-def angle_with(vec1, vec2, in_degrees=False):
+def angle_with(vec1, vec2):
     u1 = normalized(vec1)
     u2 = normalized(vec2)
     dots = dot(u1,u2)
@@ -58,4 +57,4 @@ def angle_with(vec1, vec2, in_degrees=False):
 def projection(vec1, vec2):
     unit = normalized(vec2)
     weight = dot(vec1,unit)
-    return times_scalar(unit, weight)
+    return timesscalar(unit, weight)
